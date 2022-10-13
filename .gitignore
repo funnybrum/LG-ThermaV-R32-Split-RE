@@ -1,0 +1,6 @@
+.pioenvs
+.piolibdeps
+.travis.yml
+lib/ESP32Base
+.vscode/*
+.pio/*
