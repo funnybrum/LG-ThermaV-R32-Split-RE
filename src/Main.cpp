@@ -23,7 +23,7 @@ void setup()
     settings.begin();
     wifi.begin();
     httpServer.begin();
-    // dataCollector.begin();
+    dataCollector.begin();
 
     wifi.connect();
 
@@ -34,7 +34,7 @@ void loop() {
     settings.loop();
     wifi.loop();
     httpServer.loop();
-    // dataCollector.loop();
+    dataCollector.loop();
     
     thermaV.loop();
 

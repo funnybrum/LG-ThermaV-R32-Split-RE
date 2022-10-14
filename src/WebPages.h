@@ -18,5 +18,6 @@ const char CONFIG_PAGE[] PROGMEM = R"=====(
 )=====";
 
 const char GET_JSON[] PROGMEM = R"=====({
- "rssi":%d
+ "rssi":%d,
+ "heat_power": %.0f
 })=====";

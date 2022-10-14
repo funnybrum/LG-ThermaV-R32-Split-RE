@@ -11,4 +11,7 @@ class HttpServer: public HttpServerBase {
         void handle_root();
         void handle_settings();
         void handle_get();
+        void handle_debugOn();
+        void handle_debugOff();
+        void handle_debug();
 };
