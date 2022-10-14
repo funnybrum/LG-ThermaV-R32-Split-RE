@@ -25,7 +25,7 @@ void setup()
     wifi.begin();
     httpServer.begin();
     dataCollector.begin();
-    // tempSensors.begin();
+    tempSensors.begin();
 
     wifi.connect();
 
@@ -37,7 +37,7 @@ void loop() {
     wifi.loop();
     httpServer.loop();
     dataCollector.loop();
-    // tempSensors.loop();
+    tempSensors.loop();
     
     thermaV.loop();
 

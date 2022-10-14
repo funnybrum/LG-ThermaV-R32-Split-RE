@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SoftwareSerial.h"
-
 class ThermaV {
     public:
         ThermaV();
@@ -14,6 +12,10 @@ class ThermaV {
 
         void setDebug(bool on);
         void getOutput();
+
+        static void onReceive();
+        static void onReceiveError(hardwareSerial_error_t err);
+
     private:
         uint8_t _buffer[32];
         uint8_t _bufferIndex;
@@ -46,6 +48,4 @@ class ThermaV {
         uint32_t _c603CommandCount = 0;
 
         bool debug = false;
-
-        SoftwareSerial* ss;
 };

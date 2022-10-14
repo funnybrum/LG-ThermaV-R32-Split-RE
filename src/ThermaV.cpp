@@ -1,22 +1,22 @@
 #include "Main.h"
-#include "SoftwareSerial.h"
+
+HardwareSerial MySerial(2);
 
 ThermaV::ThermaV() {
     _bufferIndex = 0;
-    ss = new SoftwareSerial();
 }
 
 void ThermaV::begin() {
-    ss->enableRxGPIOPullup(false);
-    ss->begin(300, SWSERIAL_8N1, 16, 17, false, 1024);
+    MySerial.setRxBufferSize(512);
+    MySerial.begin(300);
     _lastByteTimestamp = millis();
     _packageEndTime = millis();
     _knownPackageEndTime = millis();
 }
 
 void ThermaV::loop() {
-    while (ss->available() & _bufferIndex < 1000) {
-        _buffer[_bufferIndex] = ss->read();
+    while (MySerial.available() && _bufferIndex < 32) {
+        _buffer[_bufferIndex] = MySerial.read();
         _bufferIndex++;
         _lastByteTimestamp = millis();
     }
@@ -26,18 +26,6 @@ void ThermaV::loop() {
     //     // dataCollector.forcePush();
     //     // ESP.restart();
     // }
-
-    // if (debug) {
-    //     logger.log("ill = %lu ihl=%lu ll=%lu hl=%lu",
-    //         ss->lowLevelCountItrs,
-    //         ss->highLevelCountItrs,
-    //         ss->lowLevelCount,
-    //         ss->highLevelCount);
-    // }
-
-    if (ss->overflow()) {
-        logger.log("Overflow");
-    }
 
     /*
      300bps with SWSERIAL_8N1 is 30 bytes per second or 33.3ms per byte.
