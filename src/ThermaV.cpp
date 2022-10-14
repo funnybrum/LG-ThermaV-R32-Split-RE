@@ -100,6 +100,7 @@ void ThermaV::loop() {
                             _c601CommandCount++;
                             _c601CommandTs = millis();
                             _knownPackageEndTime = millis();
+                            _freshC601 = true;
                             break;
                         case 0x02:
                             memcpy(_c602Command, _buffer, 20);
@@ -193,7 +194,20 @@ int8_t ThermaV::getDeltaT() {
 }
 
 float ThermaV::getOutputPower() {
-    float power = getDeltaT() * getFlow() * 60 * 4200 / 3600;
-    logger.log("%d %.1f %d", getDeltaT(), getFlow(), power);
+    if (getFlow() < 5.1) {
+        // 5 means the pump is not running.
+        return 0;
+    }
+ 
+    float deltaT = tempSensors.getOutflowTemp() - tempSensors.getInflowTemp();
+    float power = deltaT * getFlow() * 60 * 4200 / 3600;
     return power;
+}
+
+bool ThermaV::freshC601() {
+    return _freshC601;
+}
+
+void ThermaV::resetFreshC601() {
+    _freshC601 = false;
 }

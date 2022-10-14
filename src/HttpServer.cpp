@@ -43,7 +43,10 @@ void HttpServer::handle_get() {
               GET_JSON,
               WiFi.RSSI(),
               millis() / 1000,
-              thermaV.getOutputPower());
+              thermaV.getOutputPower(),
+              thermaV.getFlow(),
+              tempSensors.getInflowTemp(),
+              tempSensors.getOutflowTemp());
     server->send(200, "application/json", buffer);
 }
 

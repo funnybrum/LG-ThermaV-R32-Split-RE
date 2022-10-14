@@ -16,6 +16,9 @@ class ThermaV {
         static void onReceive();
         static void onReceiveError(hardwareSerial_error_t err);
 
+        bool freshC601();
+        void resetFreshC601();
+
     private:
         uint8_t _buffer[32];
         uint8_t _bufferIndex;
@@ -25,6 +28,7 @@ class ThermaV {
         uint16_t _packagesCount = 0;
         uint16_t _unknownPackagesCount = 0;
         uint16_t _invalidPackagesCount = 0;
+        uint8_t _freshC601 = false;
 
         uint8_t _a0Command[20];
         uint8_t _a5Command[20];

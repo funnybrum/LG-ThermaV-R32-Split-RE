@@ -9,13 +9,12 @@ DataCollector::DataCollector(Logger* logger,
 }
 
 bool DataCollector::shouldCollect() {
-    return thermaV.getOutputPower() > -1 &&
-        thermaV.getOutputPower() < 20000;
+    return thermaV.freshC601();
 }
 
 void DataCollector::collectData() {
     append("heat_output", thermaV.getOutputPower());
-    append("uptime", millis()/1000);
+    thermaV.resetFreshC601();
 }
 
 bool DataCollector::shouldPush() {
