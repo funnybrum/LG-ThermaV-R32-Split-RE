@@ -7,20 +7,22 @@ class ThermaV {
         ThermaV();
         void begin();
         void loop();
-        void setDebug(bool on);
-        void getOutput(char*);
 
         float getFlow();
         int8_t getDeltaT();
         float getOutputPower();
 
+        void setDebug(bool on);
+        void getOutput();
     private:
         uint8_t _buffer[32];
         uint8_t _bufferIndex;
         uint32_t _lastByteTimestamp;
         uint32_t _packageEndTime;
         uint32_t _knownPackageEndTime;
-        uint16_t _count = 0;
+        uint16_t _packagesCount = 0;
+        uint16_t _unknownPackagesCount = 0;
+        uint16_t _invalidPackagesCount = 0;
 
         uint8_t _a0Command[20];
         uint8_t _a5Command[20];

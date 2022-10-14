@@ -8,8 +8,10 @@ ThermaV::ThermaV() {
 
 void ThermaV::begin() {
     ss->enableRxGPIOPullup(false);
-    ss->begin(300, SWSERIAL_8N1, 16, 17);
-    _lastByteTimestamp = 0;
+    ss->begin(300, SWSERIAL_8N1, 16, 17, false, 1024);
+    _lastByteTimestamp = millis();
+    _packageEndTime = millis();
+    _knownPackageEndTime = millis();
 }
 
 void ThermaV::loop() {
@@ -19,26 +21,19 @@ void ThermaV::loop() {
         _lastByteTimestamp = millis();
     }
 
-    // If no package is received in 30 seconds - reset the SofwareSerial
-    if (millis() - _knownPackageEndTime > 30000) {
-        logger.log("SS reset");
-        delete ss;
-        delay(100);
-        ss = new SoftwareSerial();
-        ss->enableRxGPIOPullup(false);
-        ss->begin(300, SWSERIAL_8N1, 16, 17);
-        _knownPackageEndTime = millis();
-    }
+    // If no package is received in 30 seconds - restart
+    // if (millis() - _knownPackageEndTime > 60000) {
+    //     // dataCollector.forcePush();
+    //     // ESP.restart();
+    // }
 
-    if (debug) {
-        if (ss->bufferIndex >= 100 && ss->bufferIndex < 1000) {
-            for (int i = 0; i < ss->bufferIndex; i++) {
-                logger.log("%2.2f %d", ss->cycles[i]/800000.0, ss->leves[i]);
-            }
-            ss->bufferIndex = 1000;
-        }
-    }
-    // logger.log("%d", ss->interrupts);
+    // if (debug) {
+    //     logger.log("ill = %lu ihl=%lu ll=%lu hl=%lu",
+    //         ss->lowLevelCountItrs,
+    //         ss->highLevelCountItrs,
+    //         ss->lowLevelCount,
+    //         ss->highLevelCount);
+    // }
 
     if (ss->overflow()) {
         logger.log("Overflow");
@@ -69,7 +64,7 @@ void ThermaV::loop() {
 
         if (debug) {
             logger.log("[%5d] %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  CRC: %02X",
-                _count,
+                _packagesCount,
                 _buffer[0],  _buffer[1],  _buffer[2],  _buffer[3],  _buffer[4],
                 _buffer[5],  _buffer[6],  _buffer[7],  _buffer[8],  _buffer[9],
                 _buffer[10], _buffer[11], _buffer[12], _buffer[13], _buffer[14],
@@ -129,16 +124,21 @@ void ThermaV::loop() {
                             _knownPackageEndTime = millis();
                             break;
                         default:
+                            _unknownPackagesCount++;
                             logger.log("Valid package received: 0xC6 0x%02X", _buffer[1]);
+                            break;
                     }
                     break;
                 default:
+                    _unknownPackagesCount++;
                     logger.log("Valid package received: 0x%02X", _buffer[0]);
+                    break;
             }
         } else {
             logger.log("Invalid package received: 0x%02X", _buffer[0]);
+            _invalidPackagesCount++;
         }
-        _count++;
+        _packagesCount++;
         _bufferIndex = 0;
     }
 
@@ -146,7 +146,6 @@ void ThermaV::loop() {
 
 void ThermaV::setDebug(bool on) {
     this->debug = on;
-    ss->bufferIndex = 0;
 }
 
 void append(uint8_t cmd[20], uint32_t count) {
@@ -158,8 +157,12 @@ void append(uint8_t cmd[20], uint32_t count) {
         cmd[15], cmd[16], cmd[17], cmd[18], cmd[19]);
 }
 
-void ThermaV::getOutput(char* buf) {
-    logger.log("Seconds since last command: %d / last known command: %d", (millis() - _packageEndTime)/1000, (millis() - _knownPackageEndTime) / 1000);
+void ThermaV::getOutput() {
+    logger.log("since last: %d / since last known: %d / unknwon: %d / invalid: %d",
+        (millis() - _packageEndTime)/1000,
+        (millis() - _knownPackageEndTime) / 1000,
+        _unknownPackagesCount,
+        _invalidPackagesCount);
     append(_a0Command, _a0CommandCount);
     append(_a5Command, _a5CommandCount);
     append(_a6Command, _a6CommandCount);
@@ -192,9 +195,9 @@ float ThermaV::getFlow() {
 }
 
 int8_t ThermaV::getDeltaT() {
-    // The A0 packages are 1 per 20 seconds. If there is no package for 30+
+    // The A0 packages are 1 per 20 seconds. If there is no package for 65+
     // seconds - there is communication problem. 
-    if (millis() - _a0CommandTs > 30000) {
+    if (millis() - _a0CommandTs > 65000) {
         return -100;
     }
 

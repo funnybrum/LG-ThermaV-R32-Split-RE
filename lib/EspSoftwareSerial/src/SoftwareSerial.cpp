@@ -536,8 +536,6 @@ void SoftwareSerial::rxBits(const uint32_t isrCycle) {
     uint32_t cycles = isrCycle - m_isrLastCycle;
     m_isrLastCycle = isrCycle;
 
-    interrupts++;
-
     uint32_t bits = cycles / m_bitCycles;
     if (cycles % m_bitCycles > (m_bitCycles >> 1)) ++bits;
     while (bits > 0) {
@@ -602,13 +600,6 @@ void SoftwareSerial::rxBits(const uint32_t isrCycle) {
 void IRAM_ATTR SoftwareSerial::rxBitISR(SoftwareSerial* self) {
     uint32_t curCycle = ESP.getCycleCount();
     bool level = *self->m_rxReg & self->m_rxBitMask;
-
-    if (self->prevInterruptCycles != 0 && self->bufferIndex < 999) {
-        self->cycles[self->bufferIndex] = curCycle - self->prevInterruptCycles;
-        self->leves[self->bufferIndex] = level;
-        self->bufferIndex++;
-    }
-    self->prevInterruptCycles = curCycle;
 
     // Store level and cycle in the buffer unless we have an overflow
     // cycle's LSB is repurposed for the level bit

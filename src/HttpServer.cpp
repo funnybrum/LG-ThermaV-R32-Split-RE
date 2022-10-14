@@ -42,19 +42,22 @@ void HttpServer::handle_get() {
     sprintf_P(buffer,
               GET_JSON,
               WiFi.RSSI(),
+              millis() / 1000,
               thermaV.getOutputPower());
     server->send(200, "application/json", buffer);
 }
 
 void HttpServer::handle_debugOn() {
     thermaV.setDebug(true);
+    server->send(200, "application/json");   
 }
 
 void HttpServer::handle_debugOff() {
     thermaV.setDebug(false);
+    server->send(200, "application/json");   
 }
 
 void HttpServer::handle_debug() {
-    thermaV.getOutput(buffer);
-    server->send(200, "application/json", buffer);   
+    thermaV.getOutput();
+    server->send(200, "application/json");   
 }

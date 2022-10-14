@@ -119,12 +119,6 @@ public:
         begin(baud, config, m_rxPin, m_txPin, m_invert);
     }
 
-    uint32_t interrupts = 0;
-    uint32_t cycles[1000];
-    uint8_t leves[1000];
-    uint16_t bufferIndex = 0;
-    uint32_t prevInterruptCycles = 0;
-
     uint32_t baudRate();
     /// Transmit control pin.
     void setTransmitEnablePin(int8_t txEnablePin);
