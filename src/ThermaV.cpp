@@ -174,10 +174,12 @@ void ThermaV::getOutput(char* buf) {
 
 float ThermaV::getFlow() {
     // C6 01 00 00 00  00 00 00 05 09  00 00 3C 00 00  F8 01 15 00 4A
-    // C6 01 00 00 00  00 00 00 05 10  00 00 3C 00 00  F8 00 F2 00 57
-    //                                                    [pump flow]
     //  00 F2 -> 24.2L
+
+    // C6 01 00 00 00  00 00 00 05 10  00 00 3C 00 00  F8 00 F2 00 57
     //  01 15 -> 27.7L
+
+    //                                                    [pump flow]
 
     // The C6 packages are 1 per 60 seconds. If there is no package for 65+
     // seconds - there is communication problem. 
