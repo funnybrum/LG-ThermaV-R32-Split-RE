@@ -10,31 +10,38 @@ The goal is to validate his approach and once ready - to merge it as part of the
 
 Current upgrades include implementation over the [ESP32 blank](https://github.com/funnybrum/ESP32Blank) project. The result is HTTP interface for setting up the WiFi and support for retrieving captured commands using an HTTP call:
 ```
-curl http://{hostname/address}/logs
+curl http://{hostname/address}/debug; curl http://{hostname/address}/logs
 ```
 
-This eposes something like:
+This exposes something like:
 ```
-[   10][  5][ 6951] R:  a0 b2 02 02 40 16 20 00 22 2d 24 12 2c 00 06 40 00
-[   11][  6][  201] R:  a0 b2 02 02 40 16 20 00 22 2c 00 01 24 12 2c 00 06 40 00 b1
-[   12][  7][  169] R:  a5 02 00 00 00 00 00 00 00 00 00 00 00 00 00 dc
-[   13][  8][  169] R:  a5 02 22 00 c0 00 00 00 00 00 00 00 00 00 00 00 00 00 00 dc
-[   14][  9][  271] R:  a6 02 00 0b b8 18 01 19 01 01 19 18 00 00 00 00 00 00 66
-[   15][ 10][  268] R:  a6 02 00 b8 19 19 19 19 00 19 19 19 00 00 00 00 00 00 66
-```
+since last package: 0 / invalid: 0
+[    7][ 0] A0 B0 00 00 40  16 20 00 22 2D  00 17 18 13 2C  00 06 58 00 B4
+[    6][ 0] A5 00 22 00 C0  00 00 00 00 00  00 00 00 00 00  00 00 00 00 D2
+[    6][ 0] A6 02 00 0B B8  19 19 19 19 19  19 19 19 00 00  00 00 00 00 66
+[    2][ 0] C0 B0 00 00 40  00 00 00 22 2D  00 17 18 13 2C  00 00 58 00 90
+[    2][ 0] C5 00 22 00 C0  00 00 00 00 00  00 00 00 00 00  00 00 00 00 F2
+[    2][ 0] C6 00 00 00 D7  1D 00 00 00 00  00 00 53 41 00  00 00 16 02 33
+[    2][37] C6 01 00 00 00  00 00 00 00 16  00 00 4B 00 01  1A 00 32 00 20
+[    2][ 0] C6 02 00 0B B8  19 19 19 19 19  19 19 19 00 00  00 00 00 00 06
+[    2][ 0] C6 03 0A 0A 0A  0A 0A 0A 0A 0A  00 00 00 00 0F  00 0C 0B B8 A2```
 
 The format is:
 ```
-[{seconds since startup}][{package count}][{gap between packages in ms}] R:  {package bytes}
+[{package count}][{seconds since last package}] {package bytes}
 ```
+
+There are total of 9 regular packages. The one in the example above.
+
+Packages starting with A0, A5 and A6 are send on regular intervals of ~20 seconds from the controller.
+Packages starting with C0, C5 and C6 are send on regular intervals of ~65 seconds from the heat pump.
+
 
 # Bulding the project
 Check the [ESP32 blank](https://github.com/funnybrum/ESP32Blank) for details on how to get the `ESP32 Base` library.
 
 # Hardware
-Simmilar to the one provided by provided by Sascha Kloß at [https://github.com/cribskip/esp8266_lgawhp], but with RX pin connected only at GPIO16.
-
-Once the protocol is reverse engineered a better hardware will be included as part of the [https://github.com/funnybrum/HeatPump] project.
+Simmilar to the one provided by provided by Sascha Kloß at [https://github.com/cribskip/esp8266_lgawhp], but with RX pin connected only at GPIO16. Once the protocol is reverse engineered a better hardware will be included as part of the [https://github.com/funnybrum/HeatPump] project.
 
 # Notes
 1) The RX part can be implemented with simpler [voltage divider](https://en.wikipedia.org/wiki/Voltage_divider). This will reduce the load on the communication pull down circuit.
