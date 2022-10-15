@@ -137,9 +137,15 @@ void ThermaV::setDebug(bool on) {
     this->debug = on;
 }
 
-void append(uint8_t cmd[20], uint32_t count) {
-    logger.log("[%5d] %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X",
-        count,
+void append(uint8_t cmd[20], uint32_t count, uint32_t timestamp=0) {
+
+    uint32_t receivedBefore = 0;
+    if (timestamp != 0) {
+        receivedBefore = (millis() - timestamp) / 1000;
+    }
+
+    logger.log("[%5d][%2d] %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X",
+        count, receivedBefore,
         cmd[0],  cmd[1],  cmd[2],  cmd[3],  cmd[4],
         cmd[5],  cmd[6],  cmd[7],  cmd[8],  cmd[9],
         cmd[10], cmd[11], cmd[12], cmd[13], cmd[14],
@@ -147,18 +153,21 @@ void append(uint8_t cmd[20], uint32_t count) {
 }
 
 void ThermaV::getOutput() {
-    logger.log("since last: %d / since last known: %d / unknwon: %d / invalid: %d",
+    logger.log("since last: %d / since last known: %d / unknwon: %d / invalid: %d / silence = %.1f, DS18B20 = %.1f / %d",
         (millis() - _packageEndTime)/1000,
         (millis() - _knownPackageEndTime) / 1000,
         _unknownPackagesCount,
-        _invalidPackagesCount);
-    append(_a0Command, _a0CommandCount);
+        _invalidPackagesCount,
+        getIdleMs() / 1000.0,
+        (millis() - tempSensors._lastReadMs) / 1000.0,
+        tempSensors._count);
+    append(_a0Command, _a0CommandCount, _a0CommandTs);
     append(_a5Command, _a5CommandCount);
     append(_a6Command, _a6CommandCount);
     append(_c0Command, _c0CommandCount);
     append(_c5Command, _c5CommandCount);
     append(_c600Command, _c600CommandCount);
-    append(_c601Command, _c601CommandCount);
+    append(_c601Command, _c601CommandCount, _c601CommandTs);
     append(_c602Command, _c602CommandCount);
     append(_c603Command, _c603CommandCount);
 }
@@ -175,7 +184,7 @@ float ThermaV::getFlow() {
 
     // The C6 packages are 1 per 60 seconds. If there is no package for 65+
     // seconds - there is communication problem. 
-    if (millis() - _c601CommandTs > 65000) {
+    if (millis() - _c601CommandTs > 90000) {
         return -100;
     }
     float flow = ((_c601Command[16]<<8) + _c601Command[17]) * 0.1f;
@@ -210,4 +219,8 @@ bool ThermaV::freshC601() {
 
 void ThermaV::resetFreshC601() {
     _freshC601 = false;
+}
+
+uint32_t ThermaV::getIdleMs() {
+    return millis() - _lastByteTimestamp;
 }

@@ -11,7 +11,7 @@ DataCollector dataCollector = DataCollector(
     &settings.getSettings()->network);
 
 ThermaV thermaV = ThermaV();
-DS18B20 tempSensors = DS18B20(4, 1000);
+DS18B20 tempSensors = DS18B20(4, 20000);
 
 void setup()
 { 
@@ -37,7 +37,7 @@ void loop() {
     wifi.loop();
     httpServer.loop();
     dataCollector.loop();
-    tempSensors.loop();
+    // tempSensors.loop();
     
     thermaV.loop();
 

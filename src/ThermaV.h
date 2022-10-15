@@ -18,6 +18,7 @@ class ThermaV {
 
         bool freshC601();
         void resetFreshC601();
+        uint32_t getIdleMs();
 
     private:
         uint8_t _buffer[32];
