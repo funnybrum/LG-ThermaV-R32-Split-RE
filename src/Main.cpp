@@ -37,7 +37,7 @@ void loop() {
     wifi.loop();
     httpServer.loop();
     dataCollector.loop();
-    // tempSensors.loop();
+    tempSensors.loop();
     
     thermaV.loop();
 

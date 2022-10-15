@@ -77,3 +77,13 @@ Seconds since last command: 0 / last known command: 0
 The first column (in the brackets) shows the number of successfully received packages. The other reprent the last version of the 9 different packages that the pump sends.
 
 5) For output power calculation the built in temperature sensor is inadequate. It measures the temperature in resolution of 1C. 1C difference at 30l/min flow is ~2kW. To address this two DS18B20 sensors will be added.
+
+
+# Notes 3
+1) There are two type of packages:
+  - starting with 0xA0, 0xA5 and 0xA6 are packages from the controller
+  - starting with 0xC0, 0xC5, 0xC6 0x01, 0xC6 0x02, 0xC6 0x03 - are packages from the heat pump
+
+2) 0xA0 and 0xC0 seems identical. 0xA0 is likely trying to set the HP state and 0xC0 reports the current heat pump state back to the controller.
+
+3) Serial communication works better with HardwareSerial port. The SoftwareSerial uses interrupts and is not compatible with the OneWire library. The latest will disable interrupts during communication with OneWire devices and this will render the SoftwareSerial non-working during that time.

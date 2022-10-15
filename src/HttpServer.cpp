@@ -42,9 +42,10 @@ void HttpServer::handle_get() {
     sprintf_P(buffer,
               GET_JSON,
               WiFi.RSSI(),
-              millis() / 1000,
               thermaV.getOutputPower(),
               thermaV.getFlow(),
+              thermaV.getInflowTemp(),
+              thermaV.getOutflowTemp(),
               tempSensors.getInflowTemp(),
               tempSensors.getOutflowTemp());
     server->send(200, "application/json", buffer);
