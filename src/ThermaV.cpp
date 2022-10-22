@@ -19,6 +19,16 @@ void ThermaV::loop() {
         _bufferIndex++;
     }
 
+    if (_pendingUfhTemp && millis() - _lastByteTimestamp > 4000) {
+        if (getCrc(_a0Command) != _a0Command[19]) {
+            // 0xA0 command has not been received. We can't send the update
+            // without it.
+            return;
+        }
+        sendUpdateCommand();
+        _pendingUfhTemp = false;
+    }
+
     /*
      300bps with SWSERIAL_8N1 is 30 bytes per second or 33.3ms per byte.
 
@@ -34,12 +44,7 @@ void ThermaV::loop() {
         (millis() - _lastByteTimestamp > 100 && _bufferIndex > 1)) {
         _packageEndTime = millis();
 
-        uint16_t crc = 0;
-        for (int i = 0; i < 19; i++) {
-            crc += _buffer[i];
-        }
-        crc = crc & 0xFF;
-        crc = crc ^ 0x55;
+        uint8_t crc = getCrc(_buffer);
 
         if (debug) {
             logPackage(crc);
@@ -47,6 +52,11 @@ void ThermaV::loop() {
 
         if (crc == _buffer[19]) {
             switch (_buffer[0]) {
+                case 0x20:
+                    memcpy(_20Command, _buffer, 20);
+                    _20CommandTs = millis();
+                    _20CommandCount++;
+                    break;
                 case 0xA0:
                     memcpy(_a0Command, _buffer, 20);
                     _a0CommandCount++;
@@ -104,7 +114,6 @@ void ThermaV::loop() {
         _packagesCount++;
         _bufferIndex = 0;
     }
-
 }
 
 void ThermaV::setDebug(bool on) {
@@ -112,7 +121,6 @@ void ThermaV::setDebug(bool on) {
 }
 
 void append(uint8_t cmd[20], uint32_t count, uint32_t timestamp=0) {
-
     uint32_t receivedBefore = 0;
     if (timestamp != 0) {
         receivedBefore = (millis() - timestamp) / 1000;
@@ -139,11 +147,19 @@ void ThermaV::getOutput() {
     append(_c601Command, _c601CommandCount, _c601CommandTs);
     append(_c602Command, _c602CommandCount);
     append(_c603Command, _c603CommandCount);
+    append(_20Command, _20CommandCount, _20CommandTs);
 }
 
 
 float ThermaV::getFlow() {
     return ((_c601Command[16]<<8) + _c601Command[17]) * 0.1f;
+}
+
+uint8_t ThermaV::getHeatingSetTemp() {
+    return _a0Command[8];
+}
+uint8_t ThermaV::getDhwSetTemp() {
+    return _a0Command[9];
 }
 
 uint8_t ThermaV::getInflowTemp() {
@@ -162,6 +178,22 @@ float ThermaV::getOutputPower() {
     }
  
     float deltaT = tempSensors.getOutflowTemp() - tempSensors.getInflowTemp();
+    // 4186j/g*C is the water specific heat energy
+    // 60 - to convert the l/s to l/h
+    // 3600 - seconds in 1 hour
+    // The formula is dT * flow in l/m * 60 * 4186 / 3600
+    // The result is in kW.
+    return deltaT * getFlow() * 4186 / 60;
+}
+
+float ThermaV::getPumpOutputPower() {
+    float flow = getFlow();
+    if (getFlow() < 5.1) {
+        // 5.0L/min means that the pump is not running.
+        return 0;
+    }
+
+    float deltaT = getOutflowTemp() - getInflowTemp();
     // 4186j/g*C is the water specific heat energy
     // 60 - to convert the l/s to l/h
     // 3600 - seconds in 1 hour
@@ -190,4 +222,79 @@ void ThermaV::logPackage(uint8_t crc) {
         _buffer[10], _buffer[11], _buffer[12], _buffer[13], _buffer[14],
         _buffer[15], _buffer[16], _buffer[17], _buffer[18], _buffer[19],
         crc);
+}
+
+
+float ThermaV::getIndoorTemp() {
+    return 10.0 + _a0Command[5] * 0.5;
+}
+
+bool ThermaV::isOutdoorUnitRunning() {
+    return _c0Command[3] & 0x02;
+}
+
+HeatPumpMode ThermaV::getMode() {
+    uint8_t stateByte = _c0Command[1];
+    uint8_t dhwStateByte = _c0Command[3];
+
+    if (stateByte & 0x02) {
+        if (stateByte & 0x10) {
+            if (dhwStateByte & 0x80) {
+                return HP_DHW_HEAT;
+            } else {
+                return HP_HEAT;
+            }
+        }
+        if (stateByte & 0x20) {
+            return HP_COOL;
+        }
+    } else {
+        return HP_OFF;
+    }
+
+    return HP_UNKNOWN;
+}
+
+
+void ThermaV::setUfhTemp(uint8_t temp) {
+    this->_ufhTemp = temp;
+    this->_dhwTemp = 0;
+    this->_pendingUfhTemp = true;
+}
+
+void ThermaV::setDhwTemp(uint8_t temp) {
+    this->_ufhTemp = 0;
+    this->_dhwTemp = temp;
+    this->_pendingUfhTemp = true;
+}
+
+void ThermaV::sendUpdateCommand() {
+    uint8_t command[20];
+
+    memcpy(command, _a0Command, 20);
+
+    command[0] = 0x20;
+    if (_ufhTemp > 0) {
+        command[8] = _ufhTemp;
+    }
+
+    if (_dhwTemp > 0) {
+        command[9] = _dhwTemp;
+    }
+
+    command[19] = getCrc(command);
+
+    logger.log("Sending 0x20 command");
+
+    MySerial.write(command, 20);
+}
+
+uint8_t ThermaV::getCrc(const uint8_t buf[20]) {
+    uint16_t crc = 0;
+    for (int i = 0; i < 19; i++) {
+        crc += buf[i];
+    }
+    crc = crc & 0xFF;
+    crc = crc ^ 0x55;
+    return crc;
 }

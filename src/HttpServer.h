@@ -14,4 +14,5 @@ class HttpServer: public HttpServerBase {
         void handle_debugOn();
         void handle_debugOff();
         void handle_debug();
+        void handle_setTemp();
 };

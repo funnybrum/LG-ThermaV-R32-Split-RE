@@ -1,5 +1,13 @@
 #pragma once
 
+enum HeatPumpMode {
+    HP_OFF,
+    HP_HEAT,
+    HP_COOL,
+    HP_DHW_HEAT,
+    HP_UNKNOWN
+};
+
 class ThermaV {
     public:
         ThermaV();
@@ -9,7 +17,15 @@ class ThermaV {
         float getFlow();
         uint8_t getOutflowTemp();
         uint8_t getInflowTemp();
+        uint8_t getHeatingSetTemp();
+        uint8_t getDhwSetTemp();
+        float getIndoorTemp();
+        bool isOutdoorUnitRunning();
+        HeatPumpMode getMode();
+
+
         float getOutputPower();
+        float getPumpOutputPower();
 
         void setDebug(bool on);
         void getOutput();
@@ -22,7 +38,13 @@ class ThermaV {
         uint32_t getIdleMs();
         void logPackage(uint8_t crc);
 
+        void setUfhTemp(uint8_t temp);
+        void setDhwTemp(uint8_t temp);
+
     private:
+        uint8_t getCrc(const uint8_t buf[20]);
+        void sendUpdateCommand();
+
         uint8_t _buffer[20];
         uint8_t _bufferIndex;
         uint32_t _lastByteTimestamp;
@@ -30,6 +52,10 @@ class ThermaV {
         uint16_t _packagesCount = 0;
         uint16_t _invalidPackagesCount = 0;
         uint32_t _skipped = 0;
+
+        uint8_t _20Command[20];
+        uint32_t _20CommandCount = 0;
+        uint32_t _20CommandTs = 0;
 
         uint8_t _a0Command[20];
         uint32_t _a0CommandCount = 0;
@@ -62,4 +88,8 @@ class ThermaV {
         uint32_t _c603CommandCount = 0;
 
         bool debug = false;
+
+        uint8_t _ufhTemp = 0;
+        uint8_t _dhwTemp = 0;
+        bool _pendingUfhTemp = false;
 };

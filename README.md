@@ -95,3 +95,15 @@ The first column (in the brackets) shows the number of successfully received pac
 2) 0xA0 and 0xC0 seems identical. 0xA0 is likely trying to set the HP state and 0xC0 reports the current heat pump state back to the controller.
 
 3) Serial communication works better with HardwareSerial port. The SoftwareSerial uses interrupts and is not compatible with the OneWire library. The latest will disable interrupts during communication with OneWire devices and this will render the SoftwareSerial non-working during that time.
+
+4) With proper hardware there are no cases of packages with CRC failures. The standard bi-directional TTL level converter is not good enough and results in communication errors.
+
+
+# Notes 4
+1) Enabled TX on the ThermaV comm line. Used an optocopler connected between 3.3V and the TX (pin 17) on the ESP32. The TX is high when there is no data, so we want a mechanism to drop the TX line GND when there is transmission. A transistor won't work there. Two transistors will work, but this complicates the schematic. And once the optocopler idea was implemented I checked how this was implemented by Sascha Kloß and surprise - exactly the same approach.
+
+2) Temperatures can be changed even when the heat pump is off. This was not possible with the built in controller.
+
+3) The idea is to be able to increase/decrease the power in order to maximize the PV consumption. This is temporary solution until a battery is added to the system.
+
+4) No other major updates are expected on the project. The next steps are likely to merge this into the [https://github.com/funnybrum/HeatPump] project.
