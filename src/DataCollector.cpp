@@ -17,7 +17,11 @@ void DataCollector::collectData() {
     append("heat_output_raw", thermaV.getPumpOutputPower());
     append("supply_temp", thermaV.getOutflowTemp());
     append("return_temp", thermaV.getInflowTemp());
+    append("outdoor_temp", thermaV.getOutdoorTemp());
+    append("supply_temp_s", tempSensors.getOutflowTemp(), 1);
+    append("return_temp_s", tempSensors.getInflowTemp(), 1);
     append("set_temp", thermaV.getHeatingSetTemp());
+    append("flow", thermaV.getFlow(), 1);
     thermaV.resetFreshC601();
 }
 

@@ -17,6 +17,7 @@ class ThermaV {
         float getFlow();
         uint8_t getOutflowTemp();
         uint8_t getInflowTemp();
+        int8_t getOutdoorTemp();
         uint8_t getHeatingSetTemp();
         uint8_t getDhwSetTemp();
         float getIndoorTemp();

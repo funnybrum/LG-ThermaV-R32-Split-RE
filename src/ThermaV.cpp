@@ -170,6 +170,10 @@ uint8_t ThermaV::getOutflowTemp() {
     return _a0Command[12];
 }
 
+int8_t ThermaV::getOutdoorTemp() {
+    return (int8_t) _c603Command[16];
+}
+
 float ThermaV::getOutputPower() {
     float flow = getFlow();
     if (getFlow() < 5.1) {

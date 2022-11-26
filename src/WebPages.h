@@ -24,11 +24,12 @@ const char GET_JSON[] PROGMEM = R"=====({
  "flow": %.1f,
  "return_temp": %d,
  "supply_temp": %d,
+ "outdoor_temp": %d,
  "set_temp": %d,
  "dhw_set_temp": %d,
  "in_temp": %.2f,
  "out_temp": %.2f,
  "indoor_temp": %.1f,
- "state": %s,
+ "state": "%s",
  "ODU_running": %s
 })=====";

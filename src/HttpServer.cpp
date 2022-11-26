@@ -67,6 +67,7 @@ void HttpServer::handle_get() {
               thermaV.getFlow(),
               thermaV.getInflowTemp(),
               thermaV.getOutflowTemp(),
+              thermaV.getOutdoorTemp(),
               thermaV.getHeatingSetTemp(),
               thermaV.getDhwSetTemp(),
               tempSensors.getInflowTemp(),
