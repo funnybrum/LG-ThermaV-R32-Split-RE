@@ -22,6 +22,7 @@ void DataCollector::collectData() {
     append("return_temp_s", tempSensors.getInflowTemp(), 1);
     append("set_temp", thermaV.getHeatingSetTemp());
     append("flow", thermaV.getFlow(), 1);
+    append("rssi", WiFi.RSSI());
     thermaV.resetFreshC601();
 }
 

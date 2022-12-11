@@ -18,7 +18,6 @@ const char CONFIG_PAGE[] PROGMEM = R"=====(
 )=====";
 
 const char GET_JSON[] PROGMEM = R"=====({
- "rssi":%d,
  "heat_power": %.0f,
  "heat_power_raw": %.0f,
  "flow": %.1f,
@@ -31,5 +30,6 @@ const char GET_JSON[] PROGMEM = R"=====({
  "out_temp": %.2f,
  "indoor_temp": %.1f,
  "state": "%s",
- "ODU_running": %s
+ "ODU_running": %s,
+ "rssi": %d
 })=====";

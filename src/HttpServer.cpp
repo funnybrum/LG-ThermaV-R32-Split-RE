@@ -61,7 +61,6 @@ void HttpServer::handle_get() {
 
     sprintf_P(buffer,
               GET_JSON,
-              WiFi.RSSI(),
               thermaV.getOutputPower(),
               thermaV.getPumpOutputPower(),
               thermaV.getFlow(),
@@ -74,7 +73,8 @@ void HttpServer::handle_get() {
               tempSensors.getOutflowTemp(),
               thermaV.getIndoorTemp(),
               state,
-              thermaV.isOutdoorUnitRunning()?"true":"false");
+              thermaV.isOutdoorUnitRunning()?"true":"false",
+              WiFi.RSSI());
     server->send(200, "application/json", buffer);
 }
 
