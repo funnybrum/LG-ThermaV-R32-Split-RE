@@ -171,7 +171,13 @@ uint8_t ThermaV::getOutflowTemp() {
 }
 
 int8_t ThermaV::getOutdoorTemp() {
-    return (int8_t) _c603Command[16];
+    // Seems like LG use custom signed representation - most left bit is the
+    // sign, the remaining is the value.
+    if (_c603Command[16] & 0x80) {
+        return (int8_t)(_c603Command[16] ^ 0x7F);
+    } else {
+        return (int8_t) _c603Command[16];
+    }
 }
 
 float ThermaV::getOutputPower() {
