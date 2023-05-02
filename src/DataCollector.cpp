@@ -34,4 +34,5 @@ void DataCollector::onPush() {
 
 void DataCollector::beforePush() {
     append("rssi", WiFi.RSSI());
+    append("uptime", millis() / (60*1000));
 }

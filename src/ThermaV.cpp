@@ -13,6 +13,17 @@ void ThermaV::begin() {
 }
 
 void ThermaV::loop() {
+    // Reset if no package has been received in the last 5 minutes?
+    if ((_a0CommandTs != 0 && millis() - _a0CommandTs > HEAT_PUMP_COMMAND_TIMEOUT_MS) ||
+        (_c601CommandTs != 0 && millis() - _c601CommandTs > HEAT_PUMP_COMMAND_TIMEOUT_MS)) {
+            while (MySerial.available()) {
+                MySerial.read();
+            }
+            logger.log("Serial port reset required");
+            _a0CommandTs = 0;
+            _c601CommandTs = 0;
+    }
+
     while (MySerial.available() && _bufferIndex < 20) {
         _lastByteTimestamp = millis();
         _buffer[_bufferIndex] = MySerial.read();
