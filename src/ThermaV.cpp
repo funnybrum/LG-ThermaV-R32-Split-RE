@@ -20,8 +20,9 @@ void ThermaV::loop() {
                 MySerial.read();
             }
             logger.log("Serial port reset required");
-            _a0CommandTs = 0;
-            _c601CommandTs = 0;
+            dataCollector.append("restart", 1, 0);
+            dataCollector.forcePush();
+            ESP.restart();
     }
 
     while (MySerial.available() && _bufferIndex < 20) {
