@@ -202,10 +202,10 @@ float ThermaV::getOutputPower() {
     float deltaT = tempSensors.getOutflowTemp() - tempSensors.getInflowTemp();
     // 4186j/g*C is the water specific heat energy
     // 60 - to convert the l/s to l/h
-    // 3600 - seconds in 1 hour
-    // The formula is dT * flow in l/m * 60 * 4186 / 3600
+    // 3412 - for converting BTU to kWh
+    // The formula is dT * flow in l/m * 60 * 4186 / 3412
     // The result is in kW.
-    return deltaT * getFlow() * 4186 / 60;
+    return deltaT * getFlow() * 73.61;
 }
 
 float ThermaV::getPumpOutputPower() {
@@ -219,9 +219,9 @@ float ThermaV::getPumpOutputPower() {
     // 4186j/g*C is the water specific heat energy
     // 60 - to convert the l/s to l/h
     // 3600 - seconds in 1 hour
-    // The formula is dT * flow in l/m * 60 * 4186 / 3600
+    // The formula is dT * flow in l/m * 60 * 4186 / 3412
     // The result is in kW.
-    return deltaT * getFlow() * 4186 / 60;
+    return deltaT * getFlow() * 73.61;
 }
 
 bool ThermaV::freshC601() {
