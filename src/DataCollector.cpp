@@ -22,7 +22,8 @@ void DataCollector::collectData() {
     append("return_temp_s", tempSensors.getInflowTemp(), 1);
     append("set_temp", thermaV.getHeatingSetTemp());
     append("flow", thermaV.getFlow(), 1);
-    thermaV.resetFreshC601();
+    append("mode", thermaV.getMode());
+    // thermaV.resetFreshC601();
 }
 
 bool DataCollector::shouldPush() {

@@ -52,8 +52,11 @@ void HttpServer::handle_get() {
         case HP_DHW_HEAT:
             strcpy(state, "dhw_heat");
             break;
+        case HP_DEFROST:
+            strcpy(state, "defrost");
+            break;
         case HP_COOL:
-            strcpy(state, "unknown");
+            strcpy(state, "cool");
             break;
         default:
             strcpy(state, "unknown");

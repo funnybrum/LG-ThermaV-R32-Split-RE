@@ -201,11 +201,11 @@ float ThermaV::getOutputPower() {
  
     float deltaT = tempSensors.getOutflowTemp() - tempSensors.getInflowTemp();
     // 4186j/g*C is the water specific heat energy
-    // 60 - to convert the l/s to l/h
-    // 3412 - for converting BTU to kWh
-    // The formula is dT * flow in l/m * 60 * 4186 / 3412
+    // 60 - to convert the l/m to l/h
+    // 3600 - for converting J to kWh
+    // The formula is dT * flow in l/m * 60 * 4186 / 3600
     // The result is in kW.
-    return deltaT * getFlow() * 73.61;
+    return deltaT * getFlow() * 69.77;
 }
 
 float ThermaV::getPumpOutputPower() {
@@ -217,11 +217,11 @@ float ThermaV::getPumpOutputPower() {
 
     float deltaT = getOutflowTemp() - getInflowTemp();
     // 4186j/g*C is the water specific heat energy
-    // 60 - to convert the l/s to l/h
-    // 3600 - seconds in 1 hour
+    // 60 - to convert the l/m to l/h
+    // 3600 - for converting J to kWh
     // The formula is dT * flow in l/m * 60 * 4186 / 3412
     // The result is in kW.
-    return deltaT * getFlow() * 73.61;
+    return deltaT * getFlow() * 69.77;
 }
 
 bool ThermaV::freshC601() {
@@ -237,7 +237,8 @@ uint32_t ThermaV::getIdleMs() {
 }
 
 void ThermaV::logPackage(uint8_t crc) {
-    logger.log("[%5d] %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  CRC: %02X",
+    logger.log("[%6d] [%5d] %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  %02X %02X %02X %02X %02X  CRC: %02X",
+        millis() / 1000,
         _packagesCount,
         _buffer[0],  _buffer[1],  _buffer[2],  _buffer[3],  _buffer[4],
         _buffer[5],  _buffer[6],  _buffer[7],  _buffer[8],  _buffer[9],
@@ -256,19 +257,27 @@ bool ThermaV::isOutdoorUnitRunning() {
 }
 
 HeatPumpMode ThermaV::getMode() {
-    uint8_t stateByte = _c0Command[1];
-    uint8_t dhwStateByte = _c0Command[3];
+    uint8_t operationByte = _c0Command[1];
+    uint8_t modeByte = _c0Command[3];
 
-    if (stateByte & 0x02) {
-        if (stateByte & 0x10) {
-            if (dhwStateByte & 0x80) {
-                return HP_DHW_HEAT;
-            } else {
-                return HP_HEAT;
-            }
+    // operatons byte = b2 - heat/dhw heat (with or without defrost)
+    // opeations byte = b0 - after heat/dhw heat mode, but in off state
+    // mode byte = 80 - dhw heat starting mode
+    // mode byte = 82 - dhw heat
+    // mode byte = 86 - dhw heat defrost
+    // mode byte = 02 - heat
+    // mode byte = 06 - heat defrost
+    // cool?
+
+    if (operationByte & 0x02) {
+        if (modeByte == 0x86 || modeByte == 0x06) {
+            return HP_DEFROST;
         }
-        if (stateByte & 0x20) {
-            return HP_COOL;
+        if (modeByte == 0x82 || modeByte == 0x80) {
+            return HP_DHW_HEAT;
+        }
+        if (modeByte == 0x02) {
+            return HP_HEAT;
         }
     } else {
         return HP_OFF;

@@ -12,6 +12,8 @@ DataCollector dataCollector = DataCollector(
 
 ThermaV thermaV = ThermaV();
 DS18B20 tempSensors = DS18B20(4, 20000);
+CirculationPump dhwCirculationPump = CirculationPump(19);
+ActuatedValve dhwValve = ActuatedValve(0, 2);
 
 void setup()
 { 
@@ -30,6 +32,8 @@ void setup()
     wifi.connect();
 
     thermaV.begin();
+    dhwCirculationPump.begin();
+    dhwValve.begin();
 }
 
 void loop() {
@@ -38,6 +42,8 @@ void loop() {
     httpServer.loop();
     dataCollector.loop();
     tempSensors.loop();
+    dhwCirculationPump.loop();
+    dhwValve.loop();
     
     thermaV.loop();
 

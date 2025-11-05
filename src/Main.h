@@ -8,6 +8,8 @@
 #include "DataCollector.h"  
 #include "DS18B20.h"
 #include "ThermaV.h"
+#include "CirculationPump.h"
+#include "ActuatedValve.h"
 
 extern WiFiManager wifi;
 extern Logger logger;

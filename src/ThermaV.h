@@ -5,6 +5,7 @@ enum HeatPumpMode {
     HP_HEAT,
     HP_COOL,
     HP_DHW_HEAT,
+    HP_DEFROST,
     HP_UNKNOWN
 };
 
