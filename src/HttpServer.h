@@ -15,4 +15,6 @@ class HttpServer: public HttpServerBase {
         void handle_debugOff();
         void handle_debug();
         void handle_setTemp();
+        void handle_dhwPumpOn();
+        void handle_dhwPumpOff();
 };

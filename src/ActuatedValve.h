@@ -8,7 +8,7 @@ enum ActuatedValveMode {
 
 class ActuatedValve {
     public:
-    ActuatedValve(uint8_t on_pin, uint8_t off_pin, uint32_t change_mode_cycle_duration=10000);
+        ActuatedValve(uint8_t on_pin, uint8_t off_pin, uint32_t change_mode_cycle_duration=10000);
         void begin();
         void loop();
         void setMode(ActuatedValveMode mode);

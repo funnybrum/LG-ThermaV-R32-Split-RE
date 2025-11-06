@@ -17,3 +17,5 @@ extern Settings settings;
 extern DataCollector dataCollector;
 extern DS18B20 tempSensors;
 extern ThermaV thermaV;
+extern CirculationPump dhwCirculationPump;
+extern ActuatedValve dhwValve;

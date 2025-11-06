@@ -14,6 +14,8 @@ void HttpServer::registerHandlers() {
     server->on("/debug/on", std::bind(&HttpServer::handle_debugOn, this));
     server->on("/debug/off", std::bind(&HttpServer::handle_debugOff, this));
     server->on("/set", std::bind(&HttpServer::handle_setTemp, this));
+    server->on("/dhw-pump/on", std::bind(&HttpServer::handle_dhwPumpOn, this));
+    server->on("/dhw-pump/off", std::bind(&HttpServer::handle_dhwPumpOff, this));
 }
 
 void HttpServer::handle_root() {
@@ -120,4 +122,16 @@ void HttpServer::handle_setTemp() {
     }
 
     server->send(200);
+}
+
+void HttpServer::handle_dhwPumpOn() {
+    dhwCirculationPump.setMode(CP_ON);
+    dhwValve.setMode(AV_ON);
+    server->send(200, "application/json");
+}
+
+void HttpServer::handle_dhwPumpOff() {
+    dhwCirculationPump.setMode(CP_OFF);
+    dhwValve.setMode(AV_OFF);
+    server->send(200, "application/json");
 }
