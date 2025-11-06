@@ -3,6 +3,8 @@
 enum ActuatedValveMode {
     AV_OFF,
     AV_ON,
+    // Used on startup only. The device require process for switching state, so
+    // we can't assume on or off at startup.
     AV_UNKNOWN
 };
 

@@ -194,7 +194,7 @@ int8_t ThermaV::getOutdoorTemp() {
 
 float ThermaV::getOutputPower() {
     float flow = getFlow();
-    if (getFlow() < 5.1) {
+    if (flow < 5.1) {
         // 5.0L/min means that the pump is not running.
         return 0;
     }
@@ -205,12 +205,12 @@ float ThermaV::getOutputPower() {
     // 3600 - for converting J to kWh
     // The formula is dT * flow in l/m * 60 * 4186 / 3600
     // The result is in kW.
-    return deltaT * getFlow() * 69.77;
+    return deltaT * flow * 69.77;
 }
 
 float ThermaV::getPumpOutputPower() {
     float flow = getFlow();
-    if (getFlow() < 5.1) {
+    if (flow < 5.1) {
         // 5.0L/min means that the pump is not running.
         return 0;
     }
@@ -221,7 +221,7 @@ float ThermaV::getPumpOutputPower() {
     // 3600 - for converting J to kWh
     // The formula is dT * flow in l/m * 60 * 4186 / 3412
     // The result is in kW.
-    return deltaT * getFlow() * 69.77;
+    return deltaT * flow * 69.77;
 }
 
 bool ThermaV::freshC601() {

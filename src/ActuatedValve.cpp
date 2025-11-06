@@ -15,9 +15,9 @@ void ActuatedValve::begin() {
 }
 
 void ActuatedValve::loop() {
-    uint32_t millis_since_last_update = millis() - this->_last_mode_change_ts;
+    uint32_t millis_since_last_mode_change = millis() - this->_last_mode_change_ts;
 
-    if (millis_since_last_update <= this->_change_mode_cycle_duration) {
+    if (millis_since_last_mode_change <= this->_change_mode_cycle_duration) {
         // Turn on one of the two relays to get the actuated valve mooving.
         digitalWrite(_on_pin, (this->_mode==AV_ON)?HIGH:LOW);
         digitalWrite(_off_pin, (this->_mode==AV_OFF)?HIGH:LOW);
