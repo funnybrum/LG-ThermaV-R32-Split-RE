@@ -31,6 +31,7 @@ const char GET_JSON[] PROGMEM = R"=====({
  "indoor_temp": %.1f,
  "state": "%s",
  "ODU_running": %s,
+ "dhw_circulation_pump": %d,
  "rssi": %d,
  "uptime": %d
 })=====";

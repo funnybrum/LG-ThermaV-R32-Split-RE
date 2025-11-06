@@ -79,6 +79,7 @@ void HttpServer::handle_get() {
               thermaV.getIndoorTemp(),
               state,
               thermaV.isOutdoorUnitRunning()?"true":"false",
+              dhwCirculationPump.getMode() == CP_ON,
               WiFi.RSSI(),
               millis()/1000);
     server->send(200, "application/json", buffer);

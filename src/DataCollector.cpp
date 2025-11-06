@@ -23,6 +23,7 @@ void DataCollector::collectData() {
     append("set_temp", thermaV.getHeatingSetTemp());
     append("flow", thermaV.getFlow(), 1);
     append("mode", thermaV.getMode());
+    append("dhw_gas_heating_pump", CP_ON == dhwCirculationPump.getMode());
     // Don't reset the freshC601 flag, assume data is flowing steadily. The
     // fresh flag messes data collection intervals.
     // thermaV.resetFreshC601();
